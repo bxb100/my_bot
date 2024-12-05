@@ -5,6 +5,7 @@ use std::sync::{LazyLock, OnceLock};
 use teloxide::types::Me;
 use url::Url;
 
+#[allow(dead_code)]
 pub struct Config {
     pub me: &'static Me,
     pub bot: &'static MyBot,
@@ -15,6 +16,7 @@ pub struct Config {
     pub webhook_port: u16,
 
     pub maintainer_id: u64,
+    pub chat_id: i64,
 }
 
 fn _from_env<T: FromStr>(name: &str) -> T
@@ -34,6 +36,7 @@ pub static BOT_CONFIG: LazyLock<Config> = LazyLock::new(|| Config {
     webhook_url: _from_env("WEBHOOK_URL"),
     webhook_port: _from_env("WEBHOOK_PORT"),
     maintainer_id: _from_env("MAINTAINER_ID"),
+    chat_id: _from_env("CHAT_ID"),
 });
 
 pub static BOT_ME: OnceLock<Me> = OnceLock::new();

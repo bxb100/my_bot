@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE wager SET user_name = ?2, action = ?3, amount = ?4, time_id = ?5 where id = ?1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "19212937ef5eb67304af2d9092d2cf288381e1cecf8a2b58da4d2e97e8db18f8"
+}

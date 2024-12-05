@@ -2,7 +2,7 @@
 
 set dotenv-load := true
 
-@run: create migrate
+@run:
     bacon run
 
 @lint:

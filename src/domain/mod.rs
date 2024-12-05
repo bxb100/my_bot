@@ -1,2 +1,2 @@
-mod user;
-mod wager;
+pub mod user;
+pub mod wager;

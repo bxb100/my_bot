@@ -4,6 +4,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::SqlitePool;
 use tokio::sync::OnceCell;
 
+#[derive(Clone, Debug)]
 pub struct Database {
     pub pool: &'static SqlitePool,
 }
