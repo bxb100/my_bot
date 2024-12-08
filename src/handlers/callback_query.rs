@@ -1,15 +1,15 @@
 use crate::db::Database;
-use crate::domain::user::{UpsertUser, UserDao};
+use crate::domain::users::{UpsertUsers, UserDao};
 use crate::domain::wager::{UpsertWager, WagerDao};
 use crate::types::{MyBot, MyResult};
 use chrono::Local;
 use log::info;
-use teloxide::prelude::{CallbackQuery, Requester};
+use teloxide::prelude::Requester;
 
 pub async fn handler(
     bot: MyBot,
     database: Database,
-    callback_query: CallbackQuery,
+    callback_query: teloxide::prelude::CallbackQuery,
 ) -> MyResult<()> {
     info!("callback_query: {:?}", callback_query.data);
     // check user exist
@@ -21,7 +21,7 @@ pub async fn handler(
     };
     if user_dao.get_by_id(user_id as i64).await?.is_none() {
         user_dao
-            .upsert(UpsertUser {
+            .upsert(UpsertUsers {
                 id: user_id as i64,
                 name: callback_query.from.username.clone(),
                 points: 1000,

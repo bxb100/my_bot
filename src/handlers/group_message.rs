@@ -1,6 +1,6 @@
 use crate::config::BOT_CONFIG;
 use crate::db::Database;
-use crate::domain::user::{UpsertUser, UserDao};
+use crate::domain::users::{UpsertUsers, UserDao};
 use crate::domain::wager::{UpsertWager, WagerDao};
 use crate::types::{MyBot, MyResult};
 use log::warn;
@@ -37,7 +37,7 @@ pub async fn handler(bot: MyBot, msg: Message, database: Database) -> MyResult<(
                 if let Ok(wager) = wager_dao.get_by_user_id_and_empty_amount(user_id).await {
                     let user = user_dao.get_by_id(user_id).await?.unwrap();
                     user_dao
-                        .upsert(UpsertUser {
+                        .upsert(UpsertUsers {
                             id: user_id,
                             name: user.name,
                             points: 0,
@@ -75,7 +75,7 @@ pub async fn handler(bot: MyBot, msg: Message, database: Database) -> MyResult<(
                     }
 
                     user_dao
-                        .upsert(UpsertUser {
+                        .upsert(UpsertUsers {
                             id: user_id,
                             name: user.name,
                             points: user.points - num as i64,

@@ -1,15 +1,16 @@
+mod api;
 mod config;
 mod db;
 mod domain;
 mod game;
 mod handlers;
+mod route;
 mod types;
 mod utils;
 
-use crate::config::{BOT_CONFIG, BOT_ME, BOT_STATIC};
+use crate::config::{BOT_ME, BOT_STATIC};
 use crate::db::Database;
 use crate::game::dice::Dice;
-use crate::handlers::handler_group_filter_message;
 use crate::types::{MyBot, MyResult};
 use chrono::{Duration, Utc};
 use chrono_tz::Asia::Shanghai;
@@ -35,14 +36,8 @@ async fn main() -> anyhow::Result<()> {
         cron_dispatch(schedule).await.expect("Failed to run");
     });
     let handler = dptree::entry()
-        .branch(
-            Update::filter_message()
-                .filter(|msg: Message| msg.chat.id.0 == BOT_CONFIG.chat_id)
-                .endpoint(handler_group_filter_message::handler),
-        )
-        .branch(
-            Update::filter_callback_query().endpoint(handlers::handler_callback_query::handler),
-        );
+        .branch(Update::filter_message().branch(route::group_message::route()))
+        .branch(Update::filter_callback_query().endpoint(handlers::callback_query::handler));
 
     Dispatcher::builder(bot, handler)
         // Here you specify initial dependencies that all handlers will receive; they can be

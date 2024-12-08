@@ -1,2 +1,2 @@
-pub mod handler_callback_query;
-pub mod handler_group_filter_message;
+pub mod callback_query;
+pub mod group_message;

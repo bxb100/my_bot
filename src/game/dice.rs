@@ -1,3 +1,4 @@
+use crate::api::telegram::send_message;
 use crate::config::BOT_CONFIG;
 use crate::db::Database;
 use crate::domain::wager::{Wager, WagerDao};
@@ -176,9 +177,7 @@ impl Dice {
             if lost_sum < 0 { "赢" } else { "输" },
             lost_sum.abs()
         );
-        bot.send_message(msg.chat.id, summary)
-            .parse_mode(ParseMode::Html)
-            .await?;
+        send_message(msg.chat.id, &summary).await?;
         // todo save to database
 
         Ok(())

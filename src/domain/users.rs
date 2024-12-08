@@ -4,7 +4,7 @@ use sqlx::{query, query_as};
 
 #[derive(Debug)]
 #[allow(dead_code)]
-pub struct User {
+pub struct Users {
     pub id: i64,
     pub name: Option<String>,
     pub points: i64,
@@ -12,7 +12,7 @@ pub struct User {
 }
 
 #[derive(Debug, Default)]
-pub struct UpsertUser {
+pub struct UpsertUsers {
     pub id: i64,
     pub name: Option<String>,
     pub points: i64,
@@ -24,9 +24,9 @@ pub struct UserDao {
 }
 
 impl UserDao {
-    pub async fn get_by_id(&self, id: i64) -> MyResult<Option<User>> {
+    pub async fn get_by_id(&self, id: i64) -> MyResult<Option<Users>> {
         let data = query_as!(
-            User,
+            Users,
             // language=sqlite
             r#"SELECT * FROM user WHERE id = ?1"#,
             id
@@ -37,7 +37,7 @@ impl UserDao {
         Ok(data)
     }
 
-    pub async fn upsert(&self, user: UpsertUser) -> MyResult<User> {
+    pub async fn upsert(&self, user: UpsertUsers) -> MyResult<Users> {
         let old = self.get_by_id(user.id).await?;
 
         if old.is_some() {
@@ -52,7 +52,7 @@ impl UserDao {
             .execute(self.database.pool)
             .await?;
 
-            return Ok(User {
+            return Ok(Users {
                 id: user.id,
                 name: user.name,
                 points: user.points,
@@ -61,7 +61,7 @@ impl UserDao {
         }
 
         let inserted = query_as!(
-            User,
+            Users,
             // language=sqlite
             r#"INSERT INTO user (id, name, points, daily_reward) VALUES (?1, ?2, ?3, ?4) RETURNING *"#,
             user.id,
