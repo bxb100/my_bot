@@ -154,8 +154,8 @@ impl Dice {
         let mut summary = String::new();
         let mut lost_sum = 0;
         map.iter().for_each(|(wager, amount)| {
+            lost_sum += amount;
             if *amount > 0 {
-                lost_sum += amount;
                 summary += &format!(
                     "恭喜<a href=\"tg://user?id={}\">{}</a>赢了 {} 积分\n",
                     wager.user_id,
@@ -163,7 +163,6 @@ impl Dice {
                     amount
                 );
             } else {
-                lost_sum -= amount;
                 summary += &format!(
                     "<a href=\"tg://user?id={}\">{}</a>失去了 {} 积分\n",
                     wager.user_id,

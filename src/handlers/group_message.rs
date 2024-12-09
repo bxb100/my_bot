@@ -11,7 +11,8 @@ use teloxide::types::MediaKind::Text;
 use teloxide::types::{MediaText, MessageCommon, MessageKind, ParseMode};
 use teloxide::Bot;
 
-pub async fn handler(bot: MyBot, msg: Message, database: Database) -> MyResult<()> {
+pub async fn handler(bot: MyBot, msg: Message, text: String, database: Database) -> MyResult<()> {
+    println!("{text}");
     // check wager exist
     if let Some(ref user) = msg.from {
         if let MessageKind::Common(MessageCommon {
@@ -120,7 +121,7 @@ async fn send_success_msg(
 
     bot.send_message(
         msg.chat.id,
-        indoc::formatdoc! {"<a href=\"{}\">{}</a>投注了 {} 期
+        indoc::formatdoc! {"<a href=\"{}\">{}</a> 投注了 {} 期
             投注积分: {}
             投注类型: {}",
             user.url(),

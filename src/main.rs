@@ -4,6 +4,7 @@ mod db;
 mod domain;
 mod game;
 mod handlers;
+mod jobs;
 mod route;
 mod types;
 mod utils;
