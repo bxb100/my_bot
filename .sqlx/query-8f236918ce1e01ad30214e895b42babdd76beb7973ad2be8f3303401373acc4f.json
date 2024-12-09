@@ -1,22 +1,22 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id, time_id, user_id, user_name, action, amount from wager where user_id = ?1 and amount is null order by time_id desc",
+  "query": "SELECT * from gambles where serial_id = ?1",
   "describe": {
     "columns": [
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
-        "name": "time_id",
+        "name": "serial_id",
         "ordinal": 1,
         "type_info": "Text"
       },
       {
         "name": "user_id",
         "ordinal": 2,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "user_name",
@@ -31,7 +31,7 @@
       {
         "name": "amount",
         "ordinal": 5,
-        "type_info": "Int64"
+        "type_info": "Integer"
       }
     ],
     "parameters": {
@@ -46,5 +46,5 @@
       true
     ]
   },
-  "hash": "56426501dd7b9c8e3454ec19be820b96581fc07f4a3673d042c0e9ac59372600"
+  "hash": "8f236918ce1e01ad30214e895b42babdd76beb7973ad2be8f3303401373acc4f"
 }

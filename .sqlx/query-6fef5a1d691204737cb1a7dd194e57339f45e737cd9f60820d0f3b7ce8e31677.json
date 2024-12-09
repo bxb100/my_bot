@@ -1,22 +1,22 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT * FROM wager where user_id = ?1 and time_id = ?2",
+  "query": "SELECT * FROM gambles where user_id = ?1 and serial_id = ?2",
   "describe": {
     "columns": [
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
-        "name": "time_id",
+        "name": "serial_id",
         "ordinal": 1,
         "type_info": "Text"
       },
       {
         "name": "user_id",
         "ordinal": 2,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "user_name",
@@ -31,7 +31,7 @@
       {
         "name": "amount",
         "ordinal": 5,
-        "type_info": "Int64"
+        "type_info": "Integer"
       }
     ],
     "parameters": {
@@ -46,5 +46,5 @@
       true
     ]
   },
-  "hash": "38d93395321918d1c8f937f2cfdf1a9053fd2e285872162c65344b1ea9b52985"
+  "hash": "6fef5a1d691204737cb1a7dd194e57339f45e737cd9f60820d0f3b7ce8e31677"
 }

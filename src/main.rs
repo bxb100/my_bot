@@ -1,7 +1,7 @@
 mod api;
 mod config;
+mod dao;
 mod db;
-mod domain;
 mod game;
 mod handlers;
 mod jobs;
@@ -11,15 +11,8 @@ mod utils;
 
 use crate::config::{BOT_ME, BOT_STATIC};
 use crate::db::Database;
-use crate::game::dice::Dice;
-use crate::types::{MyBot, MyResult};
-use chrono::{Duration, Utc};
-use chrono_tz::Asia::Shanghai;
-use chrono_tz::Tz::Asia__Shanghai;
-use cron::Schedule;
+use crate::types::MyBot;
 use log::info;
-use std::ops::Sub;
-use std::str::FromStr;
 use teloxide::prelude::*;
 use teloxide::types::ParseMode;
 
@@ -32,10 +25,6 @@ async fn main() -> anyhow::Result<()> {
     setup_me(bot.clone()).await?;
     let database = init_db().await;
 
-    let schedule = Schedule::from_str("0 0/10 08-23 * * ?")?;
-    tokio::spawn(async move {
-        cron_dispatch(schedule).await.expect("Failed to run");
-    });
     let handler = dptree::entry()
         .branch(Update::filter_message().branch(route::group_message::route()))
         .branch(Update::filter_callback_query().endpoint(handlers::callback_query::handler));
@@ -68,22 +57,4 @@ async fn setup_me(bot: MyBot) -> anyhow::Result<()> {
 
 async fn init_db() -> Database {
     Database::new().await
-}
-
-async fn cron_dispatch(schedule: Schedule) -> MyResult<()> {
-    let database = Database::new().await;
-    loop {
-        let time = schedule.upcoming(Shanghai).take(1).next().unwrap();
-        // BOT_CONFIG
-        //     .bot
-        //     .send_message(ChatId(chat_id), format!("Next game in {}", time))
-        //     .await?;
-
-        // todo
-        Dice::new(database.clone()).play().await?;
-
-        let now = Utc::now().with_timezone(&Asia__Shanghai);
-        let diff = time.sub(now);
-        tokio::time::sleep(Duration::from(diff).to_std().unwrap()).await;
-    }
 }
