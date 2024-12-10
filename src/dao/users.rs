@@ -43,9 +43,22 @@ pub async fn insert(pool: &SqlitePool, users: User) -> MyResult<()> {
 pub async fn update_amount(pool: &SqlitePool, id: i64, amount: i64) -> MyResult<()> {
     query!(
         // language=sqlite
-        r#"UPDATE users SET points = ?1 WHERE id = ?2"#,
+        r#"UPDATE users SET points = ?2 WHERE id = ?1"#,
+        id,
         amount,
-        id
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+pub async fn increase_amount(pool: &SqlitePool, id: i64, increase_amount: i64) -> MyResult<()> {
+    query!(
+        // language=sqlite
+        r#"UPDATE users SET points = points + ?2 WHERE id = ?1"#,
+        id,
+        increase_amount,
     )
     .execute(pool)
     .await?;

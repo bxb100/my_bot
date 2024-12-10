@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT id, name, scheduled_at as \"scheduled_at: _\", metadata, executed_at as \"executed_at: _\", error_message\n        FROM jobs\n        WHERE datetime(scheduled_at) <= current_timestamp AND error_message IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "scheduled_at: _",
+        "ordinal": 2,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "metadata",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "executed_at: _",
+        "ordinal": 4,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "error_message",
+        "ordinal": 5,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "0aeead6aef8d5181b166f1ac381b0794a01d17191e1521ab33c0731bf26f6e53"
+}

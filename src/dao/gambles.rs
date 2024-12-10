@@ -11,7 +11,7 @@ pub struct Gamble {
     pub amount: Option<i64>,
 }
 
-pub async fn get_by_serial_id(pool: &SqlitePool, serial_id: String) -> MyResult<Vec<Gamble>> {
+pub async fn get_by_serial_id(pool: &SqlitePool, serial_id: &String) -> MyResult<Vec<Gamble>> {
     let data = query_as!(
         Gamble,
         // language=sqlite
@@ -81,5 +81,16 @@ pub async fn update_amount(pool: &SqlitePool, id: i64, amount: i64) -> MyResult<
     .execute(pool)
     .await?;
 
+    Ok(())
+}
+
+pub async fn delete_by_serial_id(pool: &SqlitePool, serial_id: &String) -> MyResult<()> {
+    sqlx::query!(
+        // language=sqlite
+        r#"DELETE FROM gambles where serial_id = ?1"#,
+        serial_id
+    )
+    .execute(pool)
+    .await?;
     Ok(())
 }

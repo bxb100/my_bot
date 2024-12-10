@@ -20,7 +20,7 @@ impl Game for DoubleDice {
         "骰子猜大小单双(2骰子)"
     }
 
-    async fn play(
+    async fn start_play(
         &self,
         bot: &MyBot,
         chat_id: ChatId,
@@ -74,7 +74,7 @@ impl Game for DoubleDice {
 
         let mut map: HashMap<&str, IFn> = HashMap::new();
 
-        map.insert("小", box_fn!(num1 + num2 == 7, 4));
+        map.insert("小", box_fn!(num1 + num2 == 7, 2));
         map.insert(
             "小单",
             box_fn!(num1 + num2 <= 6 && num1 % 2 != 0 && num2 % 2 != 0, 4),
@@ -89,11 +89,11 @@ impl Game for DoubleDice {
         map.insert("双", box_fn!(num1 % 2 == 0 && num2 % 2 == 0, 2));
         map.insert(
             "大单",
-            box_fn!(num1 + num2 > 6 && num1 % 2 != 0 && num2 % 2 != 0, 2),
+            box_fn!(num1 + num2 > 6 && num1 % 2 != 0 && num2 % 2 != 0, 4),
         );
         map.insert(
             "小双",
-            box_fn!(num1 + num2 <= 6 && num1 % 2 == 0 && num2 % 2 == 0, 2),
+            box_fn!(num1 + num2 <= 6 && num1 % 2 == 0 && num2 % 2 == 0, 4),
         );
 
         Ok(map)

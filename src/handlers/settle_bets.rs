@@ -1,11 +1,11 @@
 use crate::api::telegram::send_message;
-use crate::dao::gambles;
+use crate::dao::{gambles, users};
 use crate::game::games;
 use crate::jobs::Job;
 use crate::types::{Context, MyError, MyResult};
-use crate::utils::{deserialize_metadata, telegram_message_url};
+use crate::utils::telegram_message_url;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::Requester;
 use teloxide::sugar::request::RequestReplyExt;
@@ -22,13 +22,14 @@ pub struct SettleBetsMetadata {
     pub game_name: String,
 }
 
+#[async_trait]
 impl Job for SettleBetsJob {
     fn name(&self) -> &str {
         "settle_bets"
     }
 
-    async fn run(&self, ctx: &Context, metadata: &Value) -> MyResult<()> {
-        let metadata: SettleBetsMetadata = deserialize_metadata(metadata)?;
+    async fn run(&self, ctx: &Context, metadata: Option<&String>) -> MyResult<()> {
+        let metadata: SettleBetsMetadata = serde_json::from_str(metadata.unwrap())?;
         let bot = ctx.bot.inner();
 
         bot.send_message(
@@ -37,7 +38,7 @@ impl Job for SettleBetsJob {
                 r#"<a href="{}">{}</a> 期准备开奖了"#,
                 telegram_message_url(
                     metadata.chat_id,
-                    metadata.chat_username,
+                    metadata.chat_username.as_deref(),
                     metadata.message_id
                 ),
                 metadata.serial_id
@@ -51,7 +52,7 @@ impl Job for SettleBetsJob {
             if game.name() == metadata.game_name {
                 let execution_result = game.execute(&ctx.bot, ChatId(metadata.chat_id)).await?;
                 let bet_gambles =
-                    gambles::get_by_serial_id(ctx.database.pool, metadata.serial_id).await?;
+                    gambles::get_by_serial_id(ctx.database.pool, &metadata.serial_id).await?;
 
                 let mut summary = String::new();
                 let mut lost_sum = 0;
@@ -78,6 +79,9 @@ impl Job for SettleBetsJob {
                                 .unwrap_or(&"anonymous".to_string()),
                             amount
                         );
+                        // fixme: should using tx
+                        users::increase_amount(ctx.database.pool, gamble.user_id, amount as i64)
+                            .await?;
                     } else {
                         summary += &format!(
                             "<a href=\"tg://user?id={}\">{}</a> 失去了 {} 积分\n",
@@ -96,6 +100,8 @@ impl Job for SettleBetsJob {
                     if lost_sum < 0 { "赢" } else { "输" },
                     lost_sum.abs()
                 );
+
+                gambles::delete_by_serial_id(ctx.database.pool, &metadata.serial_id).await?;
 
                 send_message(ChatId(metadata.chat_id), &summary).await?;
 

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE users SET points = points + ?2 WHERE id = ?1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "910289246d38986378dae645517c34fe86e7e604b9a04501703f480b1e4c2c67"
+}
