@@ -1,6 +1,6 @@
 use crate::dao::gambles;
-use crate::dao::gambles::{get_by_user_id_and_serial_id, Gambles};
-use crate::dao::users::{get_by_id, insert, Users};
+use crate::dao::gambles::{get_by_user_id_and_serial_id, Gamble};
+use crate::dao::users::{get_by_id, insert, User};
 use crate::db::Database;
 use crate::types::{MyBot, MyResult};
 use chrono::Utc;
@@ -20,7 +20,7 @@ pub async fn handler(
     if get_by_id(database.pool, user_id as i64).await?.is_none() {
         insert(
             database.pool,
-            Users {
+            User {
                 id: user_id as i64,
                 name: callback_query.from.username.clone(),
                 points: 1000,
@@ -36,12 +36,12 @@ pub async fn handler(
         if exist.is_none() {
             gambles::insert(
                 database.pool,
-                Gambles {
+                Gamble {
                     serial_id: id.to_string(),
                     user_id: user_id as i64,
                     user_name: callback_query.from.username,
                     action: action.to_string(),
-                    ..Gambles::default()
+                    ..Gamble::default()
                 },
             )
             .await?;

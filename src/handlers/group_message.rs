@@ -11,7 +11,6 @@ use teloxide::Bot;
 
 pub async fn handler(bot: MyBot, msg: Message, text: String, database: Database) -> MyResult<()> {
     info!("group_message handler: {text}");
-    // check wager exist
     if let Some(ref user) = msg.from {
         // fix
         let user_id = if user.is_bot {

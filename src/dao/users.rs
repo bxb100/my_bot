@@ -4,17 +4,17 @@ use sqlx::{query, query_as, SqlitePool};
 
 #[derive(Debug)]
 #[allow(dead_code)]
-pub struct Users {
+pub struct User {
     pub id: i64,
     pub name: Option<String>,
     pub points: i64,
     pub daily_reward: Option<DateTime<Utc>>,
 }
 
-pub async fn get_by_id(pool: &SqlitePool, id: i64) -> MyResult<Option<Users>> {
+pub async fn get_by_id(pool: &SqlitePool, id: i64) -> MyResult<Option<User>> {
     // https://github.com/launchbadge/sqlx/issues/598
     let data = query_as!(
-        Users,
+        User,
         // language=sqlite
         r#"SELECT id, name, points, daily_reward as "daily_reward: _" FROM users WHERE id = ?1"#,
         id
@@ -25,7 +25,7 @@ pub async fn get_by_id(pool: &SqlitePool, id: i64) -> MyResult<Option<Users>> {
     Ok(data)
 }
 
-pub async fn insert(pool: &SqlitePool, users: Users) -> MyResult<()> {
+pub async fn insert(pool: &SqlitePool, users: User) -> MyResult<()> {
     query!(
         // language=sqlite
         r#"INSERT INTO users (id, name, points, daily_reward) VALUES (?1, ?2, ?3, ?4)"#,

@@ -2,7 +2,7 @@ use crate::types::MyResult;
 use sqlx::{query_as, SqlitePool};
 
 #[derive(Debug, Eq, PartialEq, Hash, Default)]
-pub struct Gambles {
+pub struct Gamble {
     pub id: i64,
     pub serial_id: String,
     pub user_id: i64,
@@ -11,9 +11,9 @@ pub struct Gambles {
     pub amount: Option<i64>,
 }
 
-pub async fn get_by_serial_id(pool: &SqlitePool, serial_id: String) -> MyResult<Vec<Gambles>> {
+pub async fn get_by_serial_id(pool: &SqlitePool, serial_id: String) -> MyResult<Vec<Gamble>> {
     let data = query_as!(
-        Gambles,
+        Gamble,
         // language=sqlite
         r#"SELECT * from gambles where serial_id = ?1"#,
         serial_id
@@ -24,7 +24,7 @@ pub async fn get_by_serial_id(pool: &SqlitePool, serial_id: String) -> MyResult<
     Ok(data)
 }
 
-pub async fn insert(pool: &SqlitePool, gambles: Gambles) -> MyResult<()> {
+pub async fn insert(pool: &SqlitePool, gambles: Gamble) -> MyResult<()> {
     sqlx::query!(
             // language=sqlite
             r#"INSERT INTO gambles (serial_id, user_id, user_name, action, amount) VALUES (?1, ?2, ?3, ?4, ?5)"#,
@@ -40,9 +40,9 @@ pub async fn insert(pool: &SqlitePool, gambles: Gambles) -> MyResult<()> {
     Ok(())
 }
 
-pub async fn get_by_user_id_and_empty_amount(pool: &SqlitePool, user_id: i64) -> MyResult<Gambles> {
+pub async fn get_by_user_id_and_empty_amount(pool: &SqlitePool, user_id: i64) -> MyResult<Gamble> {
     let data = query_as!(
-        Gambles,
+        Gamble,
         // language=sqlite
         r#"SELECT * from gambles where user_id = ?1 and amount is null order by serial_id desc"#,
         user_id
@@ -57,9 +57,9 @@ pub async fn get_by_user_id_and_serial_id(
     pool: &SqlitePool,
     user_id: i64,
     serial_id: &str,
-) -> MyResult<Option<Gambles>> {
+) -> MyResult<Option<Gamble>> {
     let data = query_as!(
-        Gambles,
+        Gamble,
         // language=sqlite
         r#"SELECT * FROM gambles where user_id = ?1 and serial_id = ?2"#,
         user_id,

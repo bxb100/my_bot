@@ -1,4 +1,6 @@
 use crate::types::{MyError, MyResult};
+use serde::de::DeserializeOwned;
+use teloxide::types::{ChatId, Message, MessageId};
 
 pub fn encode_call_data(action: &str, id: &str) -> String {
     format!("{}:{}", action, id)
@@ -14,6 +16,24 @@ pub fn decode_call_data(call_data: &str) -> MyResult<(&str, &str)> {
     } else {
         Ok((data[0], data[1]))
     }
+}
+
+pub fn deserialize_metadata<T: DeserializeOwned>(metadata: &serde_json::Value) -> MyResult<T> {
+    let metadata = serde_json::from_value(metadata.clone())?;
+    Ok(metadata)
+}
+
+pub fn telegram_message_url(
+    chat_id: i64,
+    chat_username: Option<String>,
+    message_id: i32,
+) -> String {
+    Message::url_of(
+        ChatId(chat_id),
+        chat_username.as_deref(),
+        MessageId(message_id),
+    )
+    .map_or("javascript:;".to_string(), |url| url.to_string())
 }
 
 #[test]

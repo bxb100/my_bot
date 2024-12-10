@@ -23,11 +23,11 @@ create table users
 
 create table jobs
 (
-    id            integer primary key autoincrement,
+    id            integer   not null primary key autoincrement,
     name          text      not null,
 --     current_timestamp equals DATETIME('now') it's UTC timestamp
     scheduled_at  timestamp not null default current_timestamp,
-    medata        text,
+    metadata      text,
     executed_at   timestamp,
     error_message text
 );

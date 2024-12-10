@@ -1,5 +1,6 @@
 use crate::jobs::Job;
 use crate::types::{Context, MyResult};
+use crate::utils::{deserialize_metadata, telegram_message_url};
 use log::info;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -7,14 +8,15 @@ use std::fmt::{Display, Formatter};
 use std::ops::Add;
 use teloxide::payloads::UnpinChatMessageSetters;
 use teloxide::prelude::Requester;
-use teloxide::types::{ChatId, Message, MessageId};
+use teloxide::types::{ChatId, MessageId};
 
 pub struct StopBettingJob;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StopBettingMetadata {
     pub chat_id: i64,
     pub message_id: i32,
+    pub serial_id: String,
     pub chat_username: Option<String>,
     pub text: String,
 }
@@ -37,7 +39,7 @@ impl Job for StopBettingJob {
         info!("stop_betting handled, metadata: {}", metadata);
 
         let bot = &ctx.bot;
-        let metadata: StopBettingMetadata = serde_json::from_value(metadata.clone())?;
+        let metadata: StopBettingMetadata = deserialize_metadata(metadata)?;
         let chat_id = ChatId(metadata.chat_id);
         let message_id = MessageId(metadata.message_id);
 
@@ -45,16 +47,16 @@ impl Job for StopBettingJob {
             .message_id(message_id)
             .await?;
 
-        let url = Message::url_of(chat_id, metadata.chat_username.as_deref(), message_id);
+        let url = telegram_message_url(
+            metadata.chat_id,
+            metadata.chat_username,
+            metadata.message_id,
+        );
 
-        let text = if let Some(url) = url {
-            metadata
-                .text
-                .replace("javascript:;", url.as_str())
-                .add("(已停止下注)")
-        } else {
-            metadata.text
-        };
+        let text = metadata
+            .text
+            .replace("javascript:;", url.as_str())
+            .add("(已停止下注)");
 
         bot.edit_message_text(chat_id, message_id, text).await?;
 
