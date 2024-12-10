@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO jobs (name, scheduled_at, metadata)\n        VALUES ($1, $2, $3)\n        returning id, name, scheduled_at as \"scheduled_at: _\", metadata, executed_at as \"executed_at: _\", error_message\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "scheduled_at: _",
+        "ordinal": 2,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "metadata",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "executed_at: _",
+        "ordinal": 4,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "error_message",
+        "ordinal": 5,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "74c0e160c0f76f561cac4aca4492cc0911df327ffe60e6067b136d4cc91fc3ba"
+}

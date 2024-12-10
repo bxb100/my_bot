@@ -1,12 +1,12 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT * FROM user WHERE id = ?1",
+  "query": "SELECT id, name, points, daily_reward as \"daily_reward: _\" FROM users WHERE id = ?1",
   "describe": {
     "columns": [
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "name",
@@ -16,12 +16,12 @@
       {
         "name": "points",
         "ordinal": 2,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
-        "name": "daily_reward",
+        "name": "daily_reward: _",
         "ordinal": 3,
-        "type_info": "Int64"
+        "type_info": "Datetime"
       }
     ],
     "parameters": {
@@ -31,8 +31,8 @@
       false,
       true,
       false,
-      false
+      true
     ]
   },
-  "hash": "b6660a5c3695998ea94b98065a99db440aff659492fd02ed9a987b0d9e339030"
+  "hash": "9d02303da17cfd0a0d83acb1cc412c78791e1996046d0b2c4cbabff931a90d3d"
 }

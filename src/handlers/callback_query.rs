@@ -1,8 +1,9 @@
+use crate::dao::gambles;
+use crate::dao::gambles::{get_by_user_id_and_serial_id, Gamble};
+use crate::dao::users::{get_by_id, insert, User};
 use crate::db::Database;
-use crate::domain::users::{UpsertUsers, UserDao};
-use crate::domain::wager::{UpsertWager, WagerDao};
 use crate::types::{MyBot, MyResult};
-use chrono::Local;
+use chrono::Utc;
 use log::info;
 use teloxide::prelude::Requester;
 
@@ -16,38 +17,34 @@ pub async fn handler(
     let user_id = callback_query.from.id.0;
     info!("call_back_query: {:?}", callback_query.from);
 
-    let user_dao = UserDao {
-        database: database.clone(),
-    };
-    if user_dao.get_by_id(user_id as i64).await?.is_none() {
-        user_dao
-            .upsert(UpsertUsers {
+    if get_by_id(database.pool, user_id as i64).await?.is_none() {
+        insert(
+            database.pool,
+            User {
                 id: user_id as i64,
                 name: callback_query.from.username.clone(),
                 points: 1000,
-                daily_reward: Local::now().timestamp(),
-            })
-            .await?;
+                daily_reward: Some(Utc::now()),
+            },
+        )
+        .await?;
     }
 
     if let Some(data) = callback_query.data {
-        let (action, id) = crate::utils::decode_call_data(&data);
-        let wager_dao = WagerDao {
-            database: database.clone(),
-        };
-        let exist = wager_dao
-            .get_by_user_id_and_time_id(user_id as i64, id)
-            .await?;
+        let (action, id) = crate::utils::decode_call_data(&data)?;
+        let exist = get_by_user_id_and_serial_id(database.pool, user_id as i64, id).await?;
         if exist.is_none() {
-            wager_dao
-                .insert(UpsertWager {
-                    time_id: id.to_string(),
+            gambles::insert(
+                database.pool,
+                Gamble {
+                    serial_id: id.to_string(),
                     user_id: user_id as i64,
                     user_name: callback_query.from.username,
                     action: action.to_string(),
-                    amount: None,
-                })
-                .await;
+                    ..Gamble::default()
+                },
+            )
+            .await?;
         }
     }
 
