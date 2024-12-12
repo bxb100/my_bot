@@ -58,10 +58,10 @@ impl Game for Bowling {
         let value = bowling.dice().unwrap().value;
 
         let mut map: HashMap<&str, IFn> = HashMap::new();
-
+        // todo: check this
         map.insert("全倒", box_fn!(value == 6, 5));
-        map.insert("擦边", box_fn!(value == 0, 5));
-        map.insert("1个", box_fn!(value == 1, 5));
+        map.insert("擦边", box_fn!(value == 1, 5));
+        map.insert("1个", box_fn!(value == 2, 5));
         map.insert("3个", box_fn!(value == 3, 5));
         map.insert("4个", box_fn!(value == 4, 5));
         map.insert("5个", box_fn!(value == 5, 5));

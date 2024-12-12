@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use teloxide::prelude::ChatId;
 use teloxide::types::Message;
 
+mod basketball;
 mod bowling;
 mod double_dice;
 mod slot_machine;
