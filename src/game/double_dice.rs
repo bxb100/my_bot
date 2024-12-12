@@ -24,38 +24,26 @@ impl Game for DoubleDice {
         &self,
         bot: &MyBot,
         chat_id: ChatId,
-        serial_id: String,
-        msg: String,
+        serial_id: &str,
+        msg: &str,
     ) -> MyResult<Message> {
         let msg = bot
             .send_message(chat_id, msg)
             .reply_markup(InlineKeyboardMarkup::new(vec![
                 vec![
-                    InlineKeyboardButton::callback("小", encode_call_data("小", &serial_id)),
-                    InlineKeyboardButton::callback(
-                        "小单(x2)",
-                        encode_call_data("小单", &serial_id),
-                    ),
-                    InlineKeyboardButton::callback(
-                        "大双(x2)",
-                        encode_call_data("大双", &serial_id),
-                    ),
+                    InlineKeyboardButton::callback("小", encode_call_data("小", serial_id)),
+                    InlineKeyboardButton::callback("小单(x2)", encode_call_data("小单", serial_id)),
+                    InlineKeyboardButton::callback("大双(x2)", encode_call_data("大双", serial_id)),
                 ],
                 vec![
-                    InlineKeyboardButton::callback("7点(x2)", encode_call_data("7点", &serial_id)),
-                    InlineKeyboardButton::callback("大", encode_call_data("大", &serial_id)),
-                    InlineKeyboardButton::callback("单", encode_call_data("单", &serial_id)),
+                    InlineKeyboardButton::callback("7点(x2)", encode_call_data("7点", serial_id)),
+                    InlineKeyboardButton::callback("大", encode_call_data("大", serial_id)),
+                    InlineKeyboardButton::callback("单", encode_call_data("单", serial_id)),
                 ],
                 vec![
-                    InlineKeyboardButton::callback("双", encode_call_data("双", &serial_id)),
-                    InlineKeyboardButton::callback(
-                        "大单(x2)",
-                        encode_call_data("大单", &serial_id),
-                    ),
-                    InlineKeyboardButton::callback(
-                        "小双(x2)",
-                        encode_call_data("小双", &serial_id),
-                    ),
+                    InlineKeyboardButton::callback("双", encode_call_data("双", serial_id)),
+                    InlineKeyboardButton::callback("大单(x2)", encode_call_data("大单", serial_id)),
+                    InlineKeyboardButton::callback("小双(x2)", encode_call_data("小双", serial_id)),
                 ],
             ]))
             .await?;
@@ -74,26 +62,27 @@ impl Game for DoubleDice {
 
         let mut map: HashMap<&str, IFn> = HashMap::new();
 
-        map.insert("小", box_fn!(num1 + num2 == 7, 2));
+        map.insert("小", box_fn!(num1 + num2 == 7, 1));
         map.insert(
             "小单",
-            box_fn!(num1 + num2 <= 6 && num1 % 2 != 0 && num2 % 2 != 0, 4),
+            box_fn!(num1 + num2 <= 6 && num1 % 2 != 0 && num2 % 2 != 0, 2),
         );
         map.insert(
             "大双",
-            box_fn!(num1 + num2 > 6 && num1 % 2 == 0 && num2 % 2 == 0, 4),
+            box_fn!(num1 + num2 > 6 && num1 % 2 == 0 && num2 % 2 == 0, 2),
         );
-        map.insert("7点", box_fn!(num1 + num2 == 7, 4));
-        map.insert("大", box_fn!(num1 + num2 > 6, 2));
-        map.insert("单", box_fn!(num1 % 2 != 0 && num2 % 2 != 0, 2));
-        map.insert("双", box_fn!(num1 % 2 == 0 && num2 % 2 == 0, 2));
+        map.insert("7点", box_fn!(num1 + num2 == 7, 2));
+        map.insert("大", box_fn!(num1 + num2 > 6, 1));
+        map.insert("单", box_fn!(num1 % 2 != 0 && num2 % 2 != 0, 1));
+
+        map.insert("双", box_fn!(num1 % 2 == 0 && num2 % 2 == 0, 1));
         map.insert(
             "大单",
-            box_fn!(num1 + num2 > 6 && num1 % 2 != 0 && num2 % 2 != 0, 4),
+            box_fn!(num1 + num2 > 6 && num1 % 2 != 0 && num2 % 2 != 0, 2),
         );
         map.insert(
             "小双",
-            box_fn!(num1 + num2 <= 6 && num1 % 2 == 0 && num2 % 2 == 0, 4),
+            box_fn!(num1 + num2 <= 6 && num1 % 2 == 0 && num2 % 2 == 0, 2),
         );
 
         Ok(map)

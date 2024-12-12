@@ -41,12 +41,7 @@ impl Job for StartBettingJob {
 
         let text = game.message(now, settle, 1);
         let msg = game
-            .start_play(
-                &ctx.bot,
-                ChatId(metadata.chat_id),
-                serial_id.clone(),
-                text.clone(),
-            )
+            .start_play(&ctx.bot, ChatId(metadata.chat_id), &serial_id, &text)
             .await?;
 
         // add next job

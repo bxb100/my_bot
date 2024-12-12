@@ -9,6 +9,7 @@ use teloxide::prelude::ChatId;
 use teloxide::types::Message;
 
 mod double_dice;
+mod slot_machine;
 
 /// guarantee that only use for one job simultaneously
 pub type IFn = Box<dyn Fn(isize) -> isize + Send + Sync>;
@@ -45,8 +46,8 @@ pub trait Game {
         &self,
         bot: &MyBot,
         chat_id: ChatId,
-        serial_id: String,
-        msg: String,
+        serial_id: &str,
+        msg: &str,
     ) -> MyResult<Message>;
 
     async fn execute(&self, bot: &MyBot, chat_id: ChatId) -> MyResult<HashMap<&str, IFn>>;
