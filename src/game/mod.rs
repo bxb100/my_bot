@@ -1,4 +1,7 @@
+use crate::game::basketball::Basketball;
+use crate::game::bowling::Bowling;
 use crate::game::double_dice::DoubleDice;
+use crate::game::slot_machine::SlotMachine;
 use crate::types::{MyBot, MyResult};
 use crate::utils::serial_id_gen;
 use async_trait::async_trait;
@@ -17,7 +20,12 @@ mod slot_machine;
 pub type IFn = Box<dyn Fn(isize) -> isize + Send + Sync>;
 
 pub fn games() -> Vec<Box<dyn Game + Send + Sync>> {
-    vec![Box::new(DoubleDice)]
+    vec![
+        Box::new(Basketball),
+        Box::new(Bowling),
+        Box::new(DoubleDice),
+        Box::new(SlotMachine),
+    ]
 }
 
 #[async_trait]

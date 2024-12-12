@@ -5,7 +5,7 @@ use crate::jobs::{Job, GAME_END_BETTING_IN_SECS, GAME_STOP_BETTING_IN_SECS};
 use crate::types::{Context, MyResult};
 use crate::utils::serial_id_gen;
 use async_trait::async_trait;
-use chrono::Utc;
+use chrono::{Timelike, Utc};
 use chrono_tz::Asia::Shanghai;
 use log::info;
 use serde::{Deserialize, Serialize};
@@ -32,9 +32,11 @@ impl Job for StartBettingJob {
         let metadata: StartBettingMetadata = serde_json::from_str(metadata.unwrap())?;
         let games = games();
 
-        // todo choose one game:
-        let game = games.first().unwrap();
         let now = Utc::now().with_timezone(&Shanghai);
+        let game = games
+            // fixme: not right
+            .get((1440 / (now.hour() * now.minute())) as usize % games.len())
+            .unwrap();
         let serial_id = serial_id_gen(&now);
         let stop = now.add(Duration::from_secs(GAME_STOP_BETTING_IN_SECS));
         let settle = now.add(Duration::from_secs(GAME_END_BETTING_IN_SECS));

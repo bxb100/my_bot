@@ -28,8 +28,7 @@ pub fn jobs() -> Vec<Box<dyn Job + Send + Sync>> {
 pub fn default_job_schedules() -> Vec<JobSchedule> {
     vec![JobSchedule {
         name: StartBettingJob.name(),
-        // Robin 7 minutes
-        schedule: "0 0/7 08-23 * * ?".parse().unwrap(),
+        schedule: "0 0/10 08-23 * * ?".parse().unwrap(),
         metadata: serde_json::to_value(StartBettingMetadata {
             chat_id: BOT_CONFIG.chat_id,
         })
