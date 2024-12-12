@@ -29,20 +29,14 @@ impl Game for Bowling {
             .send_message(chat_id, msg)
             .reply_markup(InlineKeyboardMarkup::new(vec![
                 vec![
-                    InlineKeyboardButton::callback(
-                        "全倒(x5))",
-                        encode_call_data("全倒", serial_id),
-                    ),
-                    InlineKeyboardButton::callback(
-                        "擦边(x5))",
-                        encode_call_data("擦边", serial_id),
-                    ),
-                    InlineKeyboardButton::callback("1个(x5))", encode_call_data("1个", serial_id)),
+                    InlineKeyboardButton::callback("全倒(x5)", encode_call_data("全倒", serial_id)),
+                    InlineKeyboardButton::callback("擦边(x5)", encode_call_data("擦边", serial_id)),
+                    InlineKeyboardButton::callback("1个(x5)", encode_call_data("1个", serial_id)),
                 ],
                 vec![
-                    InlineKeyboardButton::callback("3个(x5))", encode_call_data("3个", serial_id)),
-                    InlineKeyboardButton::callback("4个(x5))", encode_call_data("4个", serial_id)),
-                    InlineKeyboardButton::callback("5个(x5))", encode_call_data("5个", serial_id)),
+                    InlineKeyboardButton::callback("3个(x5)", encode_call_data("3个", serial_id)),
+                    InlineKeyboardButton::callback("4个(x5)", encode_call_data("4个", serial_id)),
+                    InlineKeyboardButton::callback("5个(x5)", encode_call_data("5个", serial_id)),
                 ],
             ]))
             .await?;

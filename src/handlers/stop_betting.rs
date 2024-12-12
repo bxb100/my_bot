@@ -41,13 +41,13 @@ impl Job for StopBettingJob {
         "stop_betting"
     }
 
-    async fn run(&self, _id: &i64, ctx: &Context, metadata: Option<&String>) -> MyResult<()> {
+    async fn run(&self, _id: &i64, ctx: &Context, metadata: &serde_json::Value) -> MyResult<()> {
         info!("stop_betting handled, metadata: {:?}", metadata);
         // fixme: should be set in metadata?
         let now = Utc::now();
 
         let bot = &ctx.bot;
-        let metadata: StopBettingMetadata = serde_json::from_str(metadata.unwrap())?;
+        let metadata: StopBettingMetadata = serde_json::from_value(metadata.clone())?;
         let chat_id = ChatId(metadata.chat_id);
         let message_id = MessageId(metadata.message_id);
 

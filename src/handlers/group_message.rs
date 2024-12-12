@@ -28,7 +28,7 @@ pub async fn handler(bot: MyBot, msg: Message, text: String, database: Database)
                 let amount = if text == "梭哈" {
                     user.points
                 } else {
-                    text.parse::<i64>().unwrap()
+                    text.parse::<i32>().unwrap()
                 };
 
                 if user.points < amount {
@@ -66,7 +66,7 @@ async fn send_success_msg(
     bot: &Bot,
     msg: Message,
     serial_id: &str,
-    amount: i64,
+    amount: i32,
     action: &str,
 ) -> MyResult<()> {
     let user = msg.from.unwrap();

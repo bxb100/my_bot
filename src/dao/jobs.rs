@@ -2,7 +2,7 @@ use crate::types::MyResult;
 use chrono::{DateTime, Utc};
 use cron::Schedule;
 use log::info;
-use sqlx::{query, query_as, SqlitePool};
+use sqlx::{query, query_as, PgPool};
 
 #[derive(Debug)]
 pub struct JobSchedule {
@@ -17,37 +17,37 @@ pub struct Job {
     pub id: i64,
     pub name: String,
     pub scheduled_at: DateTime<Utc>,
-    pub metadata: Option<String>,
+    pub metadata: serde_json::Value,
     pub executed_at: Option<DateTime<Utc>>,
     pub error_message: Option<String>,
 }
 
 pub async fn insert(
-    pool: &SqlitePool,
+    pool: &PgPool,
     name: &str,
     scheduled_at: &DateTime<Utc>,
     metadata: &serde_json::Value,
 ) -> MyResult<Job> {
     let job = query_as!(
         Job,
-        // language=sqlite
+        // language=postgresql
         r#"
         INSERT INTO jobs (name, scheduled_at, metadata)
         VALUES ($1, $2, $3)
-        returning id, name, scheduled_at as "scheduled_at: _", metadata, executed_at as "executed_at: _", error_message
+        returning *
         "#,
         name,
         scheduled_at,
         metadata
     )
-        .fetch_one(pool)
-        .await?;
+    .fetch_one(pool)
+    .await?;
 
     Ok(job)
 }
 
 pub async fn get_by_name_and_scheduled_at(
-    pool: &SqlitePool,
+    pool: &PgPool,
     name: &str,
     schedule_at: &DateTime<Utc>,
 ) -> MyResult<Job> {
@@ -58,43 +58,43 @@ pub async fn get_by_name_and_scheduled_at(
 
     let job = query_as!(
         Job,
-        // language=sqlite
+        // language=postgresql
         r#"
-        SELECT id, name, scheduled_at as "scheduled_at: _", metadata, executed_at as "executed_at: _", error_message
+        SELECT *
         FROM jobs
         WHERE name = $1 AND scheduled_at = $2
         "#,
         name,
         schedule_at
     )
-        .fetch_one(pool)
-        .await?;
+    .fetch_one(pool)
+    .await?;
 
     Ok(job)
 }
 
-pub async fn get_jobs_to_execute(pool: &SqlitePool) -> MyResult<Vec<Job>> {
+pub async fn get_jobs_to_execute(pool: &PgPool) -> MyResult<Vec<Job>> {
     let jobs = query_as!(
         Job,
-        // language=sqlite
+        // language=postgresql
         r#"
-        SELECT id, name, scheduled_at as "scheduled_at: _", metadata, executed_at as "executed_at: _", error_message
+        SELECT *
         FROM jobs
-        WHERE datetime(scheduled_at) <= current_timestamp AND error_message IS NULL
+        WHERE scheduled_at <= now() AND error_message IS NULL
         "#
     )
-        .fetch_all(pool)
-        .await?;
+    .fetch_all(pool)
+    .await?;
 
     Ok(jobs)
 }
 
-pub async fn update_job_executed_at(pool: &SqlitePool, id: i64) -> MyResult<()> {
+pub async fn update_job_executed_at(pool: &PgPool, id: i64) -> MyResult<()> {
     query!(
-        // language=sqlite
+        // language=postgresql
         r#"
         UPDATE jobs
-        SET executed_at = current_timestamp
+        SET executed_at = now()
         WHERE id = $1
         "#,
         id
@@ -105,9 +105,9 @@ pub async fn update_job_executed_at(pool: &SqlitePool, id: i64) -> MyResult<()> 
     Ok(())
 }
 
-pub async fn delete_job(pool: &SqlitePool, id: i64) -> MyResult<()> {
+pub async fn delete_job(pool: &PgPool, id: i64) -> MyResult<()> {
     query!(
-        // language=sqlite
+        // language=postgresql
         r#"
         DELETE FROM jobs
         WHERE id = $1
@@ -120,13 +120,9 @@ pub async fn delete_job(pool: &SqlitePool, id: i64) -> MyResult<()> {
     Ok(())
 }
 
-pub async fn update_job_error_message(
-    pool: &SqlitePool,
-    id: i64,
-    message: &String,
-) -> MyResult<()> {
+pub async fn update_job_error_message(pool: &PgPool, id: i64, message: &String) -> MyResult<()> {
     query!(
-        // language=sqlite
+        // language=postgresql
         r#"
         UPDATE jobs
         SET error_message = $2

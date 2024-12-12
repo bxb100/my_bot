@@ -2,34 +2,33 @@
 -- Add migration script here
 create table gambles
 (
-    id        integer not null primary key autoincrement,
-    serial_id text    not null,
-    user_id   integer not null,
-    user_name text,
-    action    text    not null,
-    amount    int     null
+    id        BIGSERIAL PRIMARY KEY,
+    serial_id TEXT   NOT NULL,
+    user_id   BIGINT NOT NULL,
+    user_name TEXT,
+    action    TEXT   NOT NULL,
+    amount    INTEGER
 );
 
 create unique index if not exists gambles_serial_id_user_id_unique_id on gambles (serial_id, user_id);
 
 create table users
 (
-    id           integer not null primary key,
-    name         text,
-    points       integer not null default 0,
-    daily_reward timestamp
+    id           BIGINT  NOT NULL PRIMARY KEY,
+    name         TEXT,
+    points       INTEGER NOT NULL DEFAULT 0,
+    daily_reward TIMESTAMP WITH TIME ZONE
 );
 
 
 create table jobs
 (
-    id            integer   not null primary key autoincrement,
-    name          text      not null,
---     current_timestamp equals DATETIME('now') it's UTC timestamp
-    scheduled_at  timestamp not null default current_timestamp,
-    metadata      text,
-    executed_at   timestamp,
-    error_message text
+    id            BIGSERIAL                NOT NULL PRIMARY KEY,
+    name          TEXT                     NOT NULL,
+    scheduled_at  TIMESTAMP WITH TIME ZONE not null,
+    metadata      JSONB,
+    executed_at   TIMESTAMP WITH TIME ZONE,
+    error_message TEXT
 );
 
 create unique index jobs_name_scheduled_at_unique_index on jobs (name, scheduled_at);

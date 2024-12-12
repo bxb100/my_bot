@@ -14,7 +14,7 @@ pub const GAME_STOP_TO_END_BETTING_IN_SECS: u64 = 60;
 pub trait Job {
     fn name(&self) -> &str;
 
-    async fn run(&self, id: &i64, ctx: &Context, metadata: Option<&String>) -> MyResult<()>;
+    async fn run(&self, id: &i64, ctx: &Context, metadata: &serde_json::Value) -> MyResult<()>;
 }
 
 pub fn jobs() -> Vec<Box<dyn Job + Send + Sync>> {

@@ -26,10 +26,10 @@ impl Job for StartBettingJob {
         "start_betting"
     }
 
-    async fn run(&self, id: &i64, ctx: &Context, metadata: Option<&String>) -> MyResult<()> {
+    async fn run(&self, id: &i64, ctx: &Context, metadata: &serde_json::Value) -> MyResult<()> {
         info!("start_betting, {:?}", metadata);
 
-        let metadata: StartBettingMetadata = serde_json::from_str(metadata.unwrap())?;
+        let metadata: StartBettingMetadata = serde_json::from_value(metadata.clone())?;
         let games = games();
         let game = unsafe { games.get_unchecked(*id as usize % games.len()) };
 

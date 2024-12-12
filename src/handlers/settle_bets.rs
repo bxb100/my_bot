@@ -28,8 +28,8 @@ impl Job for SettleBetsJob {
         "settle_bets"
     }
 
-    async fn run(&self, _id: &i64, ctx: &Context, metadata: Option<&String>) -> MyResult<()> {
-        let metadata: SettleBetsMetadata = serde_json::from_str(metadata.unwrap())?;
+    async fn run(&self, _id: &i64, ctx: &Context, metadata: &serde_json::Value) -> MyResult<()> {
+        let metadata: SettleBetsMetadata = serde_json::from_value(metadata.clone())?;
         let bot = ctx.bot.inner();
 
         bot.send_message(
@@ -80,7 +80,7 @@ impl Job for SettleBetsJob {
                             amount
                         );
                         // fixme: should using tx
-                        users::increase_amount(ctx.database.pool, gamble.user_id, amount as i64)
+                        users::increase_amount(ctx.database.pool, gamble.user_id, amount as i32)
                             .await?;
                     } else {
                         summary += &format!(

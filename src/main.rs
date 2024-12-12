@@ -9,7 +9,7 @@ mod route;
 mod types;
 mod utils;
 
-use crate::config::{BOT_ME, BOT_STATIC};
+use crate::config::{BOT_CONFIG, BOT_ME, BOT_STATIC};
 use crate::db::Database;
 use crate::jobs::default_job_schedules;
 use crate::types::{Context, MyBot};
@@ -18,6 +18,7 @@ use log::{error, info};
 use std::sync::Arc;
 use teloxide::prelude::*;
 use teloxide::types::ParseMode;
+use teloxide::update_listeners::webhooks;
 use tokio::{task, time};
 
 #[tokio::main]
@@ -41,12 +42,21 @@ async fn main() -> anyhow::Result<()> {
         .branch(Update::filter_message().branch(route::group_message::route()))
         .branch(Update::filter_callback_query().endpoint(handlers::callback_query::handler));
 
+    let addr = ([0, 0, 0, 0], BOT_CONFIG.webhook_port).into();
+    let url = BOT_CONFIG.webhook_url.clone();
+    let listener = webhooks::axum(bot.clone(), webhooks::Options::new(addr, url))
+        .await
+        .expect("Couldn't setup webhook");
+
     Dispatcher::builder(bot, handler)
         .dependencies(dptree::deps![database])
         .default_handler(default_log_handler)
         .enable_ctrlc_handler()
         .build()
-        .dispatch()
+        .dispatch_with_listener(
+            listener,
+            LoggingErrorHandler::with_custom_text("An error from the update listener"),
+        )
         .await;
 
     Ok(())

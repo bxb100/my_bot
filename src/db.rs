@@ -7,13 +7,13 @@ use crate::jobs::jobs;
 use crate::types::{Context, MyResult};
 use chrono::Utc;
 use log::{error, info, trace};
-use sqlx::sqlite::SqlitePoolOptions;
-use sqlx::SqlitePool;
+use sqlx::postgres::PgPoolOptions;
+use sqlx::PgPool;
 use tokio::sync::OnceCell;
 
 #[derive(Clone, Debug)]
 pub struct Database {
-    pub pool: &'static SqlitePool,
+    pub pool: &'static PgPool,
 }
 
 impl Database {
@@ -23,12 +23,12 @@ impl Database {
         }
     }
 
-    pub async fn get_connection_pool() -> &'static SqlitePool {
-        static POOL: OnceCell<SqlitePool> = OnceCell::const_new();
+    pub async fn get_connection_pool() -> &'static PgPool {
+        static POOL: OnceCell<PgPool> = OnceCell::const_new();
 
         POOL.get_or_init(|| async {
             info!("Init SQLite");
-            SqlitePoolOptions::new()
+            PgPoolOptions::new()
                 .connect(&BOT_CONFIG.database_url)
                 .await
                 .expect("Failed to connect SQLite")
@@ -77,7 +77,7 @@ pub async fn run_scheduled_jobs(ctx: &Context, db: &Database) -> anyhow::Result<
     for job in jobs.iter() {
         update_job_executed_at(db.pool, job.id).await?;
 
-        match handle_job(ctx, &job.id, &job.name, job.metadata.as_ref()).await {
+        match handle_job(ctx, &job.id, &job.name, &job.metadata).await {
             Ok(_) => {
                 trace!("job successfully executed (id={})", job.id);
                 delete_job(db.pool, job.id).await?;
@@ -96,7 +96,7 @@ async fn handle_job(
     ctx: &Context,
     id: &i64,
     name: &String,
-    metadata: Option<&String>,
+    metadata: &serde_json::Value,
 ) -> MyResult<()> {
     for job in jobs() {
         if job.name() == name {
