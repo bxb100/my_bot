@@ -77,7 +77,7 @@ pub async fn run_scheduled_jobs(ctx: &Context, db: &Database) -> anyhow::Result<
     for job in jobs.iter() {
         update_job_executed_at(db.pool, job.id).await?;
 
-        match handle_job(ctx, &job.name, job.metadata.as_ref()).await {
+        match handle_job(ctx, &job.id, &job.name, job.metadata.as_ref()).await {
             Ok(_) => {
                 trace!("job successfully executed (id={})", job.id);
                 delete_job(db.pool, job.id).await?;
@@ -92,10 +92,15 @@ pub async fn run_scheduled_jobs(ctx: &Context, db: &Database) -> anyhow::Result<
     Ok(())
 }
 
-async fn handle_job(ctx: &Context, name: &String, metadata: Option<&String>) -> MyResult<()> {
+async fn handle_job(
+    ctx: &Context,
+    id: &i64,
+    name: &String,
+    metadata: Option<&String>,
+) -> MyResult<()> {
     for job in jobs() {
         if job.name() == name {
-            return job.run(ctx, metadata).await;
+            return job.run(id, ctx, metadata).await;
         }
     }
     trace!(

@@ -28,7 +28,7 @@ impl Job for SettleBetsJob {
         "settle_bets"
     }
 
-    async fn run(&self, ctx: &Context, metadata: Option<&String>) -> MyResult<()> {
+    async fn run(&self, _id: &i64, ctx: &Context, metadata: Option<&String>) -> MyResult<()> {
         let metadata: SettleBetsMetadata = serde_json::from_str(metadata.unwrap())?;
         let bot = ctx.bot.inner();
 

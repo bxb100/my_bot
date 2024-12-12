@@ -41,7 +41,7 @@ impl Job for StopBettingJob {
         "stop_betting"
     }
 
-    async fn run(&self, ctx: &Context, metadata: Option<&String>) -> MyResult<()> {
+    async fn run(&self, _id: &i64, ctx: &Context, metadata: Option<&String>) -> MyResult<()> {
         info!("stop_betting handled, metadata: {:?}", metadata);
         // fixme: should be set in metadata?
         let now = Utc::now();
